@@ -273,9 +273,7 @@ Modules.pipeline = (() => {
         </form>
       </div>
       <div class="modal-foot">
-        ${editing
-          ? `<button class="btn btn-danger" id="req-fill" style="margin-right:auto;">${Icon('check')} Mark Filled</button>`
-          : `<span class="text-xs text-muted" style="margin-right:auto;">${Icon('info')} Saved to this browser session only — not yet synced to the shared database.</span>`}
+        ${editing ? `<button class="btn btn-danger" id="req-fill" style="margin-right:auto;">${Icon('check')} Mark Filled</button>` : ''}
         <button class="btn btn-secondary" data-close>Cancel</button>
         <button class="btn btn-primary" id="req-save">${Icon('check')} ${editing?'Save Changes':'Raise Requisition'}</button>
       </div>
@@ -283,13 +281,19 @@ Modules.pipeline = (() => {
 
     qsa('[data-close]', overlay).forEach(b => b.addEventListener('click', closeOverlay));
     const fillBtn = qs('#req-fill', overlay);
-    if (fillBtn) fillBtn.addEventListener('click', () => {
-      Store.updateRequisition(reqId, { status: 'Filled', stage: 'Filled' });
-      toast(`Req ${req.reqNo} marked Filled`);
-      closeOverlay();
-      render(qs('#route-container'));
+    if (fillBtn) fillBtn.addEventListener('click', async () => {
+      fillBtn.disabled = true; fillBtn.textContent = 'Updating…';
+      try {
+        await Store.updateRequisition(reqId, { status: 'Filled', stage: 'Filled' });
+        toast(`Req ${req.reqNo} marked Filled`);
+        closeOverlay();
+        render(qs('#route-container'));
+      } catch (err) {
+        toast(`Couldn't mark Req ${req.reqNo} Filled: ${err.message}`, 'error');
+        fillBtn.disabled = false; fillBtn.innerHTML = `${Icon('check')} Mark Filled`;
+      }
     });
-    qs('#req-save', overlay).addEventListener('click', () => {
+    qs('#req-save', overlay).addEventListener('click', async () => {
       const form = qs('#req-form', overlay);
       if (!form.reportValidity()) return;
       const fd = new FormData(form);
@@ -300,10 +304,17 @@ Modules.pipeline = (() => {
       const offMeta = OFFERINGS.find(o => o.name === data.offering);
       if (offMeta) data.serviceLine = offMeta.serviceLine;
       data.entity = Store.entity;
-      if (editing) { Store.updateRequisition(reqId, data); toast(`Req ${req.reqNo} updated`); }
-      else { const created = Store.addRequisition(data); toast(`Requisition ${created.reqNo} raised`); }
-      closeOverlay();
-      const rc = qs('#route-container'); if (rc) render(rc);
+      const saveBtn = qs('#req-save', overlay);
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      try {
+        if (editing) { await Store.updateRequisition(reqId, data); toast(`Req ${req.reqNo} updated`); }
+        else { const created = await Store.addRequisition(data); toast(`Requisition ${created.reqNo} raised`); }
+        closeOverlay();
+        const rc = qs('#route-container'); if (rc) render(rc);
+      } catch (err) {
+        toast(`Couldn't save requisition: ${err.message}`, 'error');
+        saveBtn.disabled = false; saveBtn.innerHTML = `${Icon('check')} ${editing?'Save Changes':'Raise Requisition'}`;
+      }
     });
   }
 
