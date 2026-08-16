@@ -315,28 +315,38 @@ Modules.employees = (() => {
             </div>
           </div>
           <div class="modal-foot">
-            <span class="text-xs text-muted" style="margin-right:auto;">${Icon('info')} Local to this session only.</span>
             <button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-danger" id="deact-confirm">Deactivate Record</button>
           </div>
         `);
         qsa('[data-close]').forEach(b => b.addEventListener('click', () => { closeOverlay(); paint(); }));
-        qs('#deact-confirm').addEventListener('click', () => {
-          Store.deactivateEmployee(emp.id, qs('#deact-reason').value);
-          closeOverlay();
-          toast(`${emp.name} marked Inactive`);
-          render(qs('#route-container'));
+        qs('#deact-confirm').addEventListener('click', async () => {
+          const btn = qs('#deact-confirm');
+          btn.disabled = true; btn.textContent = 'Deactivating…';
+          try {
+            await Store.deactivateEmployee(emp.id, qs('#deact-reason').value);
+            closeOverlay();
+            toast(`${emp.name} marked Inactive`);
+            render(qs('#route-container'));
+          } catch (err) {
+            toast(`Couldn't deactivate ${emp.name}: ${err.message}`, 'error');
+            btn.disabled = false; btn.textContent = 'Deactivate Record';
+          }
         });
       });
       // documents tab uploads
       qsa('[data-upload]', overlay).forEach(btn => btn.addEventListener('click', () => {
         const input = document.createElement('input'); input.type = 'file';
-        input.addEventListener('change', () => {
+        input.addEventListener('change', async () => {
           if (!input.files[0]) return;
           const docs = Object.assign({}, emp.documents || {});
           docs[btn.dataset.upload] = { name: input.files[0].name, uploadedAt: new Date().toISOString() };
-          Store.updateEmployee(emp.id, { documents: docs });
-          toast(`${input.files[0].name} attached`);
-          paint();
+          try {
+            await Store.updateEmployee(emp.id, { documents: docs });
+            toast(`${input.files[0].name} attached`);
+            paint();
+          } catch (err) {
+            toast(`Couldn't attach ${input.files[0].name}: ${err.message}`, 'error');
+          }
         });
         input.click();
       }));
@@ -480,13 +490,12 @@ Modules.employees = (() => {
         </form>
       </div>
       <div class="modal-foot">
-        <span class="text-xs text-muted" style="margin-right:auto;">${Icon('info')} Saved to this browser session only — not yet synced to the shared database (write-back is coming in a later phase).</span>
         <button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="emp-save">${Icon('check')} ${editing?'Save Changes':'Add Employee'}</button>
       </div>
     `, { wide: true });
 
     qsa('[data-close]', overlay).forEach(b => b.addEventListener('click', closeOverlay));
-    qs('#emp-save', overlay).addEventListener('click', () => {
+    qs('#emp-save', overlay).addEventListener('click', async () => {
       const form = qs('#emp-form', overlay);
       if (!form.reportValidity()) return;
       const fd = new FormData(form);
@@ -497,15 +506,22 @@ Modules.employees = (() => {
         data.professionCode = profSelect.selectedOptions[0].dataset.code;
       }
       data.isGCC = false;
-      if (editing) {
-        Store.updateEmployee(empId, data);
-        toast(`${data.name || emp.name} updated`);
-      } else {
-        const created = Store.addEmployee(data);
-        toast(`${created.name} added to the register`);
+      const saveBtn = qs('#emp-save', overlay);
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      try {
+        if (editing) {
+          await Store.updateEmployee(empId, data);
+          toast(`${data.name || emp.name} updated`);
+        } else {
+          const created = await Store.addEmployee(data);
+          toast(`${created.name} added to the register`);
+        }
+        closeOverlay();
+        render(qs('#route-container'));
+      } catch (err) {
+        toast(`Couldn't save ${data.name || emp.name || 'employee'}: ${err.message}`, 'error');
+        saveBtn.disabled = false; saveBtn.innerHTML = `${Icon('check')} ${editing?'Save Changes':'Add Employee'}`;
       }
-      closeOverlay();
-      render(qs('#route-container'));
     });
   }
 
