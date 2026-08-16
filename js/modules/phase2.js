@@ -137,11 +137,11 @@ Modules.phase2 = (() => {
           </div>
 
           <div class="grid grid-2 mt-16">
-            <div class="panel">
+            <div class="panel" style="min-width:0;">
               <div class="panel-head"><div><h3>Visit type mix</h3><div class="sub">Currently active or arriving, sample data</div></div></div>
-              <div class="panel-body"><canvas id="bv-chart-type" height="200"></canvas></div>
+              <div class="panel-body"><div style="position:relative; height:200px; width:100%; overflow:hidden;"><canvas id="bv-chart-type" style="width:100%; height:100%;"></canvas></div></div>
             </div>
-            <div class="panel">
+            <div class="panel" style="min-width:0;">
               <div class="panel-head"><div><h3>By sponsor account</h3><div class="sub">Which accounts are drawing the most short-term visits</div></div></div>
               <div class="panel-body"><canvas id="bv-chart-account" height="200"></canvas></div>
             </div>
@@ -266,7 +266,7 @@ Modules.phase2 = (() => {
     mountChart(id, {
       type: 'doughnut',
       data: { labels, datasets: [{ data, backgroundColor: colors }] },
-      options: { cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } } } }
+      options: { maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } } } }
     }, { labels: true, labelColor: '#fff' });
   }
 
