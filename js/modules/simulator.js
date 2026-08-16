@@ -307,21 +307,32 @@ Modules.simulator = (() => {
     qs('#sim-reset', root).addEventListener('click', () => { quick = { hireSaudi:0, hireNonSaudi:0, exits:0 }; moves = []; render(root); toast('Scenario reset'); });
     qs('#sim-add-move', root).addEventListener('click', () => openMoveForm(root));
     qsa('[data-rm-move]', root).forEach(b => b.addEventListener('click', () => { moves = moves.filter(m=>m.id!==b.dataset.rmMove); render(root); }));
-    qs('#sim-save', root).addEventListener('click', () => {
+    qs('#sim-save', root).addEventListener('click', async () => {
       const base = basePool(); const scenario = applyScenario(base, quick, moves); const stats = Engine.headcountStats(scenario);
       const cfg = Store.nitaqatConfig[Store.entity]; const zone = Engine.zoneFor(stats.ratio, cfg);
       const name = prompt('Name this scenario', `Scenario ${Store.savedScenarios.length+1}`);
       if (!name) return;
-      Store.saveScenario({ name, quick: Object.assign({},quick), moves: JSON.parse(JSON.stringify(moves)), entity: Store.entity, resultTotal: stats.total, resultRatio: stats.ratio, resultZone: zone.name });
-      toast('Scenario saved locally');
-      render(root);
+      try {
+        await Store.saveScenario({ name, quick: Object.assign({},quick), moves: JSON.parse(JSON.stringify(moves)), entity: Store.entity, resultTotal: stats.total, resultRatio: stats.ratio, resultZone: zone.name });
+        toast('Scenario saved');
+        render(root);
+      } catch (err) {
+        toast(`Couldn't save scenario: ${err.message}`, 'error');
+      }
     });
     qsa('[data-load-sc]', root).forEach(b => b.addEventListener('click', () => {
       const s = Store.savedScenarios.find(x=>x.id===b.dataset.loadSc); if (!s) return;
       quick = Object.assign({hireSaudi:0,hireNonSaudi:0,exits:0}, s.quick); moves = s.moves || [];
       render(root); toast(`Loaded "${s.name}"`);
     }));
-    qsa('[data-del-sc]', root).forEach(b => b.addEventListener('click', () => { Store.deleteScenario(b.dataset.delSc); render(root); }));
+    qsa('[data-del-sc]', root).forEach(b => b.addEventListener('click', async () => {
+      try {
+        await Store.deleteScenario(b.dataset.delSc);
+        render(root);
+      } catch (err) {
+        toast(`Couldn't delete scenario: ${err.message}`, 'error');
+      }
+    }));
   }
 
   // Cheap, chart-free recompute used while a slider is actively being dragged.
