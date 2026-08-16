@@ -50,10 +50,10 @@ Modules.employees = (() => {
       </div>
 
       <div class="grid grid-4 mt-16">
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Nationality — filtered set</div><canvas id="emp-chart-nat" height="120"></canvas></div>
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Gender — filtered set</div><canvas id="emp-chart-gender" height="120"></canvas></div>
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Status — filtered set</div><canvas id="emp-chart-status" height="120"></canvas></div>
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">RAG — filtered set</div><canvas id="emp-chart-rag" height="120"></canvas></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Nationality — filtered set</div><div style="position:relative; height:120px; width:100%; overflow:hidden;"><canvas id="emp-chart-nat" style="width:100%; height:100%;"></canvas></div></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Gender — filtered set</div><div style="position:relative; height:120px; width:100%; overflow:hidden;"><canvas id="emp-chart-gender" style="width:100%; height:100%;"></canvas></div></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Status — filtered set</div><div style="position:relative; height:120px; width:100%; overflow:hidden;"><canvas id="emp-chart-status" style="width:100%; height:100%;"></canvas></div></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">RAG — filtered set</div><div style="position:relative; height:120px; width:100%; overflow:hidden;"><canvas id="emp-chart-rag" style="width:100%; height:100%;"></canvas></div></div>
       </div>
 
       <div class="panel mt-16">
@@ -108,7 +108,7 @@ Modules.employees = (() => {
     const smallDonut = (id, labels, data, colors) => mountChart(id, {
       type: 'doughnut',
       data: { labels, datasets: [{ data, backgroundColor: colors }] },
-      options: { cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9.5 } } } } }
+      options: { maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9.5 } } } } }
     }, { labels: true, labelColor: '#fff', labelOptions: { font: { size: 9, weight: '700' } } });
 
     const saudi = rows.filter(e => e.isSaudi).length;
