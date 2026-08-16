@@ -71,17 +71,30 @@ const Engine = (() => {
   }
 
   function zoneIndex(entityConfig, zoneName) {
-    return entityConfig.zones.findIndex(z => z.name === zoneName);
+    // Explicitly sorted ascending by min — never trust the caller's array
+    // order (see zoneFor's comment: real NITAQAT_CONFIG data from
+    // data-remote.js arrives sorted ascending by min, i.e. Red-first, not
+    // Platinum-first like the old hardcoded config used to be).
+    const zones = entityConfig.zones.slice().sort((a, b) => a.min - b.min);
+    return zones.findIndex(z => z.name === zoneName);
   }
 
   // How many additional Saudis (at current total headcount) would be needed to
-  // reach the next-better zone, and how far a single non-Saudi addition would
-  // move the ratio the wrong way. Returns null if already in the best zone.
+  // reach the next-better zone. Returns null if already in the best zone.
+  // Found via unit testing (2026-08-16): this previously assumed
+  // `entityConfig.zones[idx - 1]` was always the next-BETTER zone, which
+  // only holds if the array happens to arrive Platinum-first. With the real
+  // app's actual (ascending, Red-first) zone order this was backwards: a
+  // company in Red got told "Already at Platinum — best available standing"
+  // (idx 0 read as "already best"), and everyone else got shown gap-to a
+  // WORSE zone than their current one. Fixed the same way zoneFor/
+  // renderZoneGauge were: sort explicitly, don't trust array order.
   function nextZoneGap(ratio, saudiCount, totalCount, entityConfig) {
-    const zones = entityConfig.zones;
-    const idx = zoneIndex(entityConfig, zoneFor(ratio, entityConfig).name);
-    if (idx <= 0) return null; // already Platinum
-    const next = zones[idx - 1];
+    const zones = entityConfig.zones.slice().sort((a, b) => a.min - b.min); // ascending, explicit
+    const current = zoneFor(ratio, entityConfig);
+    const idx = zones.findIndex(z => z.name === current.name);
+    if (idx === -1 || idx === zones.length - 1) return null; // already in the best (highest-min) zone
+    const next = zones[idx + 1];
     const neededRatio = next.min;
     const neededSaudi = Math.ceil(neededRatio * totalCount);
     const headsShort = Math.max(0, neededSaudi - saudiCount);
@@ -164,7 +177,12 @@ const Engine = (() => {
 
     // Milestone (upcoming within 60 days, based on join-date anniversary)
     let upcomingMilestone = null;
-    if (emp.status === 'Active') {
+    // Guard against a missing/invalid joiningDate on an Active record — found
+    // via unit testing: without this, toISOString() below throws on an
+    // Invalid Date and crashes the whole render for that employee, not just
+    // this one panel. Real data always has joiningDate today, but this is a
+    // cheap defensive backstop against a bad/incomplete future record.
+    if (emp.status === 'Active' && emp.joiningDate && !isNaN(toDate(emp.joiningDate))) {
       const years = t.years;
       [5, 10, 15, 20].forEach(mark => {
         const anniv = new Date(toDate(emp.joiningDate));
@@ -299,8 +317,16 @@ const Engine = (() => {
   function leavingSoon(employees, asOf, horizonDays) {
     asOf = asOf || new Date();
     horizonDays = horizonDays || 60;
-    const active = activeOf(employees);
-    return active
+    // Deliberately not activeOf() here — that only keeps status === 'Active',
+    // which was silently dropping every already-Attrition employee BEFORE
+    // the filter below (which explicitly checks for 'Attrition') ever ran.
+    // Found via unit testing (2026-08-16): the Attrition branch was dead
+    // code, so Manager cockpit's "Resignation in notice" row, Home's
+    // "Leaving Soon" count, and the employees __leavingSoon quick-filter
+    // were all silently undercounting by however many people are already
+    // in Attrition status.
+    const pool = employees.filter(e => e.status === 'Active' || e.status === 'Attrition');
+    return pool
       .map(e => deriveEmployee(e, asOf))
       .filter(e => e.status === 'Attrition' || (e.contractDaysLeft !== null && e.contractDaysLeft <= horizonDays))
       .sort((a, b) => (a.contractDaysLeft ?? -1) - (b.contractDaysLeft ?? -1));
