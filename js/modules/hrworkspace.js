@@ -381,18 +381,24 @@ Modules.hrworkspace = (() => {
         </form>
       </div>
       <div class="modal-foot">
-        <span class="text-xs text-muted" style="margin-right:auto;">${Icon('info')} Saved to this browser session only — not yet synced to the shared database.</span>
         <button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="cfg-save">${Icon('check')} Save Configuration</button>
       </div>
     `);
     qsa('[data-close]', overlay).forEach(b => b.addEventListener('click', closeOverlay));
-    qs('#cfg-save', overlay).addEventListener('click', () => {
+    qs('#cfg-save', overlay).addEventListener('click', async () => {
       const fd = new FormData(qs('#cfg-form', overlay));
       const patch = { registeredActivity: fd.get('registeredActivity'), activityRef: fd.get('activityRef'), sizeCategory: fd.get('sizeCategory'), lastReviewed: fd.get('lastReviewed'), reviewedBy: fd.get('reviewedBy'), target: Number(fd.get('targetPct'))/100 };
-      Store.updateNitaqatConfig(entity, patch);
-      closeOverlay();
-      toast('Regulatory configuration updated');
-      render(qs('#route-container'));
+      const btn = qs('#cfg-save', overlay);
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        await Store.updateNitaqatConfig(entity, patch);
+        closeOverlay();
+        toast('Regulatory configuration updated');
+        render(qs('#route-container'));
+      } catch (err) {
+        toast(`Couldn't save configuration: ${err.message}`, 'error');
+        btn.disabled = false; btn.innerHTML = `${Icon('check')} Save Configuration`;
+      }
     });
   }
 
