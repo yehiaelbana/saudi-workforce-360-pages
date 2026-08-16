@@ -89,8 +89,8 @@ Modules.simulator = (() => {
             <div class="flex justify-between mt-8"><span class="text-sm text-muted">Margin to target</span><span class="mono ${scMargin>=0?'up':'down'}">${scMargin>=0?'+':''}${Engine.fmtPct(scMargin)} <span class="text-muted">(was ${baseMargin>=0?'+':''}${Engine.fmtPct(baseMargin)})</span></span></div>
             <div class="divider"></div>
             <div class="grid grid-2" style="gap:6px;">
-              <div><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Current</div><canvas id="sim-chart-nat-base" height="110"></canvas></div>
-              <div><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Scenario</div><canvas id="sim-chart-nat-sc" height="110"></canvas></div>
+              <div><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Current</div><div style="position:relative; height:110px;"><canvas id="sim-chart-nat-base"></canvas></div></div>
+              <div><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Scenario</div><div style="position:relative; height:110px;"><canvas id="sim-chart-nat-sc"></canvas></div></div>
             </div>
           </div>
         </div>
@@ -254,7 +254,11 @@ Modules.simulator = (() => {
       mountChart(id, {
         type: 'doughnut',
         data: { labels: ['Saudi', 'Non-Saudi'], datasets: [{ data: [saudi, pool.length - saudi], backgroundColor: [CHART_PALETTE[0], CHART_PALETTE[6]] }] },
-        options: { cutout: '58%', plugins: { legend: { display: false } } }
+        // maintainAspectRatio:false + a height-constrained wrapper div (see
+        // the canvas markup above) — without both, Chart.js's default square
+        // aspect ratio grows the doughnut to match the panel's full width
+        // instead of the intended ~110px height, blowing up the whole card.
+        options: { maintainAspectRatio: false, cutout: '58%', plugins: { legend: { display: false } } }
       }, { labels: true, labelColor: '#fff', labelOptions: { font: { size: 9, weight: '700' } } });
     };
     donut('sim-chart-nat-base', base);
