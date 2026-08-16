@@ -89,8 +89,8 @@ Modules.simulator = (() => {
             <div class="flex justify-between mt-8"><span class="text-sm text-muted">Margin to target</span><span class="mono ${scMargin>=0?'up':'down'}">${scMargin>=0?'+':''}${Engine.fmtPct(scMargin)} <span class="text-muted">(was ${baseMargin>=0?'+':''}${Engine.fmtPct(baseMargin)})</span></span></div>
             <div class="divider"></div>
             <div class="grid grid-2" style="gap:6px;">
-              <div><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Current</div><div style="position:relative; height:110px;"><canvas id="sim-chart-nat-base"></canvas></div></div>
-              <div><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Scenario</div><div style="position:relative; height:110px;"><canvas id="sim-chart-nat-sc"></canvas></div></div>
+              <div style="min-width:0;"><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Current</div><div style="position:relative; height:110px; width:100%; overflow:hidden;"><canvas id="sim-chart-nat-base" style="width:100%; height:100%;"></canvas></div></div>
+              <div style="min-width:0;"><div class="text-xs text-muted" style="text-align:center; font-weight:700;">Scenario</div><div style="position:relative; height:110px; width:100%; overflow:hidden;"><canvas id="sim-chart-nat-sc" style="width:100%; height:100%;"></canvas></div></div>
             </div>
           </div>
         </div>
