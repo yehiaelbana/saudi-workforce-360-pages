@@ -84,8 +84,8 @@ Modules.home = (() => {
         <div class="panel">
           <div class="panel-head"><div><h3>Workforce composition</h3><div class="sub">Active, ${entity === 'KSA' ? 'DXC Saudi Arabia' : 'Regional HQ'}</div></div></div>
           <div class="panel-body grid grid-2" style="gap:10px;">
-            <div><canvas id="home-chart-nat" height="180"></canvas></div>
-            <div><canvas id="home-chart-gender" height="180"></canvas></div>
+            <div style="min-width:0;"><div style="position:relative; height:180px; width:100%; overflow:hidden;"><canvas id="home-chart-nat" style="width:100%; height:100%;"></canvas></div></div>
+            <div style="min-width:0;"><div style="position:relative; height:180px; width:100%; overflow:hidden;"><canvas id="home-chart-gender" style="width:100%; height:100%;"></canvas></div></div>
           </div>
           <div class="panel-foot text-xs text-muted">National context: Saudi female labour-force participation reached 36.3% in Q1 2025, already above the original 30% Vision 2030 target (General Authority for Statistics / MHRSD reporting) — shown for reference only, not a direct comparison to this workforce's mix.</div>
         </div>
@@ -358,7 +358,7 @@ Modules.home = (() => {
     mountChart('home-chart-nat', {
       type: 'doughnut',
       data: { labels: ['Saudi', 'Non-Saudi'], datasets: [{ data: [saudi, nonSaudi], backgroundColor: [CHART_PALETTE[0], CHART_PALETTE[6]] }] },
-      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } }, title: { display: true, text: 'Nationality', font: baseChartFont() } }, cutout: '62%' }
+      options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } }, title: { display: true, text: 'Nationality', font: baseChartFont() } }, cutout: '62%' }
     }, { labels: true, labelColor: '#fff', labelFormatter: (v, ctx) => v ? `${v}` : '' });
   }
 
@@ -368,7 +368,7 @@ Modules.home = (() => {
     mountChart('home-chart-gender', {
       type: 'doughnut',
       data: { labels, datasets: [{ data: labels.map(l => byG[l].length), backgroundColor: [CHART_PALETTE[1], CHART_PALETTE[2], CHART_PALETTE[6]] }] },
-      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } }, title: { display: true, text: 'Gender', font: baseChartFont() } }, cutout: '62%' }
+      options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } }, title: { display: true, text: 'Gender', font: baseChartFont() } }, cutout: '62%' }
     }, { labels: true, labelColor: '#fff' });
   }
 
