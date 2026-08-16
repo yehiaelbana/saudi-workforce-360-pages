@@ -20,7 +20,7 @@ function mapEmployeeRow(r) {
     offering: r.offering, account: r.accounts ? r.accounts.name : null, managerId: r.manager_id,
     role: r.role, jobTitle: r.job_title, level: r.level, levelRank: r.level_rank, profession: r.profession,
     professionCode: r.profession_code, sce: r.sce, family: r.family, location: r.location,
-    joiningDate: r.joining_date, endDate: r.end_date, contractType: r.contract_type,
+    joiningDate: r.joining_date, endDate: r.end_date, separationReason: r.separation_reason, contractType: r.contract_type,
     milestoneTag: r.milestone_tag, qiwaStatus: r.qiwa_status, iqamaExpiry: r.iqama_expiry,
     complianceDocExpiry: r.compliance_doc_expiry, exitReentry: r.exit_reentry, email: r.email, phone: r.phone,
   };
@@ -35,6 +35,13 @@ function mapRequisitionRow(r) {
     targetStartDate: r.target_start_date, createdDate: r.created_date, vacancyReason: r.vacancy_reason,
     entity: r.entity,
   };
+}
+
+// scenarios: {id, name, created_by, payload jsonb, created_at} -> the shape
+// js/modules/simulator.js already reads (quick/moves/entity/resultTotal/
+// resultRatio/resultZone live inside payload; name+savedAt are top-level).
+function mapScenarioRow(r) {
+  return Object.assign({ id: r.id, name: r.name, savedAt: r.created_at }, r.payload || {});
 }
 
 async function fetchAppData() {
@@ -52,6 +59,7 @@ async function fetchAppData() {
     nitaqat: supabaseClient.from('nitaqat_config').select('*, nitaqat_zones(*)'),
     employees: supabaseClient.from('employees').select('*, accounts(name)'),
     requisitions: supabaseClient.from('requisitions').select('*, accounts(name)'),
+    scenarios: supabaseClient.from('scenarios').select('*').order('created_at', { ascending: false }),
   };
 
   const keys = Object.keys(queries);
@@ -64,7 +72,9 @@ async function fetchAppData() {
 
   SERVICE_LINES = byKey.serviceLines.map(r => ({ id: r.id, name: r.name }));
   OFFERINGS = byKey.offerings.map(r => ({ name: r.name, serviceLine: r.service_line_id }));
-  ACCOUNTS = byKey.accounts.map(r => ({ name: r.name, entity: r.entity, sector: r.sector, active: r.active }));
+  // id kept (not just name) -- employee/requisition writes need it to resolve
+  // an account name back to the account_id FK (see Store's mapEmployeeToRow).
+  ACCOUNTS = byKey.accounts.map(r => ({ id: r.id, name: r.name, entity: r.entity, sector: r.sector, active: r.active }));
   LOCATIONS = byKey.locations.map(r => r.name);
   LEVELS = byKey.levels.map(r => r.name);
   JOB_TITLES = byKey.jobTitles.map(r => r.name);
@@ -96,6 +106,7 @@ async function fetchAppData() {
   return {
     employees: byKey.employees.map(mapEmployeeRow),
     requisitions: byKey.requisitions.map(mapRequisitionRow),
+    scenarios: byKey.scenarios.map(mapScenarioRow),
     nitaqatConfig: NITAQAT_CONFIG,
     professionCategories: PROFESSION_CATEGORIES,
   };
