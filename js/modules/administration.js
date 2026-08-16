@@ -184,7 +184,7 @@ Modules.administration = (() => {
         access until a role is assigned below — that's enforced by the database itself, not just this screen.
         ${pendingCount ? `<span class="chip chip-amber" style="margin-left:6px;">${pendingCount} awaiting a role</span>` : ''}
       </p>
-      ${rows.length ? `<div class="panel panel-pad mb-16" style="max-width:340px;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Access by role</div><canvas id="admin-chart-roles" height="160"></canvas></div>` : ''}
+      ${rows.length ? `<div class="panel panel-pad mb-16" style="max-width:340px;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Access by role</div><div style="position:relative; height:160px; width:100%; overflow:hidden;"><canvas id="admin-chart-roles" style="width:100%; height:100%;"></canvas></div></div>` : ''}
       <div class="table-wrap"><table class="data-table">
         <thead><tr><th>Email</th><th>Role</th><th>Scope</th><th>Signed up</th><th></th></tr></thead>
         <tbody>${rows.map(p => usersRow(p)).join('') || `<tr><td colspan="5" class="table-empty">No one has signed in yet.</td></tr>`}</tbody>
@@ -275,8 +275,8 @@ Modules.administration = (() => {
     const countFor = (key, val) => emp.filter(e => e.status==='Active' && e[key]===val).length;
     return `
       <div class="grid grid-2" style="align-items:start;">
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Active headcount by service line</div><canvas id="admin-chart-sl" height="160"></canvas></div>
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Active headcount by level</div><canvas id="admin-chart-level" height="160"></canvas></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Active headcount by service line</div><div style="position:relative; height:160px; width:100%; overflow:hidden;"><canvas id="admin-chart-sl" style="width:100%; height:100%;"></canvas></div></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700; margin-bottom:6px;">Active headcount by level</div><canvas id="admin-chart-level" height="160"></canvas></div>
       </div>
       <div class="grid grid-2 mt-16" style="align-items:start;">
         <div>
@@ -319,7 +319,7 @@ Modules.administration = (() => {
     mountChart('admin-chart-sl', {
       type: 'pie',
       data: { labels: slRows.map(r=>r.name), datasets: [{ data: slRows.map(r=>r.n), backgroundColor: CHART_PALETTE }] },
-      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, font: { size: 10 } } } } }
+      options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, font: { size: 10 } } } } }
     }, { labels: true, labelColor: '#fff', labelOptions: { font: { size: 9.5, weight: '700' } } });
 
     const byLevel = Engine.groupBy(active, 'level');
@@ -340,7 +340,7 @@ Modules.administration = (() => {
     mountChart('admin-chart-roles', {
       type: 'doughnut',
       data: { labels: labels.map(r => r==='pending' ? 'Pending' : getRole(r).label), datasets: [{ data: labels.map(r=>byRole[r]), backgroundColor: CHART_PALETTE }] },
-      options: { cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, font: { size: 10 } } } } }
+      options: { maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 9, font: { size: 10 } } } } }
     }, { labels: true, labelColor: '#fff' });
   }
 
