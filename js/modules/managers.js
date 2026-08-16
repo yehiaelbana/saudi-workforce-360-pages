@@ -212,9 +212,9 @@ Modules.managers = (() => {
     const profComp = Engine.professionCompliance(sc.activeTeam, Store.professionCategories).filter(c => c.total > 0);
     return `
       <div class="grid grid-3 mt-8" style="margin-bottom:18px;">
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700;">By Nationality</div><canvas id="mgr-chart-nat" height="150"></canvas></div>
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700;">By Level</div><canvas id="mgr-chart-level" height="150"></canvas></div>
-        <div class="panel panel-pad"><div class="text-xs text-muted" style="font-weight:700;">By Location</div><canvas id="mgr-chart-loc" height="150"></canvas></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700;">By Nationality</div><div style="position:relative; height:150px; width:100%; overflow:hidden;"><canvas id="mgr-chart-nat" style="width:100%; height:100%;"></canvas></div></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700;">By Level</div><canvas id="mgr-chart-level" height="150"></canvas></div>
+        <div class="panel panel-pad" style="min-width:0;"><div class="text-xs text-muted" style="font-weight:700;">By Location</div><div style="position:relative; height:150px; width:100%; overflow:hidden;"><canvas id="mgr-chart-loc" style="width:100%; height:100%;"></canvas></div></div>
       </div>
       ${profComp.length ? `
       <div class="panel panel-pad mb-16">
@@ -245,7 +245,7 @@ Modules.managers = (() => {
     mountChart('mgr-chart-nat', {
       type: 'pie',
       data: { labels: Object.keys(byNat), datasets: [{ data: Object.values(byNat).map(a=>a.length), backgroundColor: CHART_PALETTE }] },
-      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9.5 } } } } }
+      options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9.5 } } } } }
     }, { labels: true, labelColor: '#fff', labelOptions: { font: { size: 9.5, weight: '700' } } });
 
     const byLevel = Engine.groupBy(sc.activeTeam, 'level');
@@ -259,7 +259,7 @@ Modules.managers = (() => {
     mountChart('mgr-chart-loc', {
       type: 'pie',
       data: { labels: Object.keys(byLoc), datasets: [{ data: Object.values(byLoc).map(a=>a.length), backgroundColor: CHART_PALETTE.slice().reverse() }] },
-      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9.5 } } } } }
+      options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9.5 } } } } }
     }, { labels: true, labelColor: '#fff', labelOptions: { font: { size: 9.5, weight: '700' } } });
   }
 
