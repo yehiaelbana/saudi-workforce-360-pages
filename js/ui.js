@@ -79,10 +79,12 @@ function toast(msg, kind) {
   let stack = qs('.toast-stack');
   if (!stack) { stack = document.createElement('div'); stack.className = 'toast-stack'; document.body.appendChild(stack); }
   const el = document.createElement('div');
-  el.className = 'toast';
-  el.innerHTML = `${Icon('checkCircle')}<span>${esc(msg)}</span>`;
+  const isError = kind === 'error';
+  el.className = 'toast' + (isError ? ' toast-error' : '');
+  el.innerHTML = `${Icon(isError ? 'alertCircle' : 'checkCircle')}<span>${esc(msg)}</span>`;
   stack.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .25s'; setTimeout(() => el.remove(), 260); }, 2600);
+  // errors stay up longer -- a failed write is worth reading, not glancing past
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .25s'; setTimeout(() => el.remove(), 260); }, isError ? 5000 : 2600);
 }
 
 // ---------------------------------------------------------------------------
