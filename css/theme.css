@@ -76,6 +76,14 @@ html, body { height: 100%; }
    at full intrinsic size, filling entire panels. */
 svg { width: 16px; height: 16px; flex: 0 0 auto; }
 .inline-icon { width: 15px; height: 15px; vertical-align: -3px; margin-right: 2px; }
+/* Same "missing safety net" class of bug as the svg rule above: a <canvas>
+   has a 300px default intrinsic width, which forces a CSS Grid track wider
+   than its column and pushes charts past their panel's right edge — found
+   2026-08-16 across every pie/doughnut chart in the app. This is a global
+   backstop; each chart's own wrapper div still sets the real height and its
+   Chart.js config still needs maintainAspectRatio:false to size correctly,
+   this just guarantees it can never visually overflow even if one is missed. */
+canvas { max-width: 100%; }
 body {
   margin: 0;
   font-family: var(--font);
