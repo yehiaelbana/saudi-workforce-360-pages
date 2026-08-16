@@ -87,18 +87,24 @@ Modules.administration = (() => {
           </form>
         </div>
         <div class="modal-foot">
-          <span class="text-xs text-muted" style="margin-right:auto;">${Icon('info')} Saved to this browser session only — not yet synced to the shared database.</span>
           <button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="pt-save">${Icon('check')} Save Targets</button>
         </div>
       `);
       qsa('[data-close]', overlay).forEach(b => b.addEventListener('click', closeOverlay));
-      qs('#pt-save', overlay).addEventListener('click', () => {
+      qs('#pt-save', overlay).addEventListener('click', async () => {
         const fd = new FormData(qs('#pt-form', overlay));
         const updated = cats.map(c => Object.assign({}, c, { target: Number(fd.get('t-'+c.code))/100 }));
-        Store.updateProfessionTargets(updated);
-        closeOverlay();
-        toast('Profession-category targets updated');
-        paint();
+        const btn = qs('#pt-save', overlay);
+        btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+          await Store.updateProfessionTargets(updated);
+          closeOverlay();
+          toast('Profession-category targets updated');
+          paint();
+        } catch (err) {
+          toast(`Couldn't save targets: ${err.message}`, 'error');
+          btn.disabled = false; btn.innerHTML = `${Icon('check')} Save Targets`;
+        }
       });
     }
 
@@ -116,15 +122,21 @@ Modules.administration = (() => {
           </form>
         </div>
         <div class="modal-foot">
-          <span class="text-xs text-muted" style="margin-right:auto;">${Icon('info')} Saved to this browser session only — not yet synced to the shared database.</span>
           <button class="btn btn-secondary" data-close>Cancel</button><button class="btn btn-primary" id="rc-save">${Icon('check')} Save</button>
         </div>
       `);
       qsa('[data-close]', overlay).forEach(b => b.addEventListener('click', closeOverlay));
-      qs('#rc-save', overlay).addEventListener('click', () => {
+      qs('#rc-save', overlay).addEventListener('click', async () => {
         const fd = new FormData(qs('#rc-form', overlay));
-        Store.updateNitaqatConfig(entity, { registeredActivity: fd.get('registeredActivity'), target: Number(fd.get('targetPct'))/100, lastReviewed: fd.get('lastReviewed') });
-        closeOverlay(); toast(`${entity} regulatory config updated`); paint();
+        const btn = qs('#rc-save', overlay);
+        btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+          await Store.updateNitaqatConfig(entity, { registeredActivity: fd.get('registeredActivity'), target: Number(fd.get('targetPct'))/100, lastReviewed: fd.get('lastReviewed') });
+          closeOverlay(); toast(`${entity} regulatory config updated`); paint();
+        } catch (err) {
+          toast(`Couldn't save config: ${err.message}`, 'error');
+          btn.disabled = false; btn.innerHTML = `${Icon('check')} Save`;
+        }
       });
     }
   }
