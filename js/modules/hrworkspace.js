@@ -106,7 +106,7 @@ Modules.hrworkspace = (() => {
         <div class="panel">
           <div class="panel-head"><div><h3>Qiwa contract documentation</h3><div class="sub">${esc(QIWA_RULE_NOTE.slice(0,84))}…</div></div></div>
           <div class="panel-body grid grid-2" style="align-items:center;">
-            <canvas id="hrw-chart-qiwa" height="180"></canvas>
+            <div style="position:relative; height:180px; width:100%; overflow:hidden; min-width:0;"><canvas id="hrw-chart-qiwa" style="width:100%; height:100%;"></canvas></div>
             <div>
               ${miniRow('Documented', qiwaDocumented, 'green')}
               ${miniRow('Pending', qiwaPending, 'amber')}
@@ -118,7 +118,7 @@ Modules.hrworkspace = (() => {
         <div class="panel">
           <div class="panel-head"><div><h3>Iqama / work authorization</h3><div class="sub">Non-Saudi active workforce, ${iqamaPool.length} records</div></div></div>
           <div class="panel-body grid grid-2" style="align-items:center;">
-            <canvas id="hrw-chart-iqama" height="180"></canvas>
+            <div style="position:relative; height:180px; width:100%; overflow:hidden; min-width:0;"><canvas id="hrw-chart-iqama" style="width:100%; height:100%;"></canvas></div>
             <div>
               ${miniRow('Valid (60d+)', iqamaValid, 'green')}
               ${miniRow('Expiring ≤60d', iqamaSoon, 'amber')}
@@ -304,7 +304,7 @@ Modules.hrworkspace = (() => {
     mountChart(id, {
       type: 'doughnut',
       data: { labels, datasets: [{ data, backgroundColor: colors }] },
-      options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } } } }
+      options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: baseChartFont() } } } }
     }, { labels: true, labelColor: '#fff' });
   }
 
