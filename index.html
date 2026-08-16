@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Saudi Workforce 360 — DXC Saudi Arabia</title>
+<link rel="stylesheet" href="css/theme.css" />
+<!-- Switched from cdnjs to jsdelivr 2026-08-05: the cdnjs Chart.js and
+     chartjs-chart-matrix URLs both 404 (verified via direct fetch) — this
+     had been silently masked since before this project's Claude Code
+     sessions started, because the app's own "library unavailable offline"
+     fallback is *too* graceful: it looks like a deliberate offline mode,
+     not a broken CDN link. Found only by actually looking at a real
+     signed-in screenshot. jsdelivr confirmed reachable for all three. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="app-shell"></div>
+
+<!-- Supabase client -->
+<script src="js/supabase-client.js"></script>
+
+<!-- Data layer -->
+<script src="js/data-core.js"></script>
+<script src="js/data-config.js"></script>
+
+<!-- Engine / state / shared UI -->
+<script src="js/engine.js"></script>
+<script src="js/store.js"></script>
+<script src="js/data-remote.js"></script>
+<script src="js/ui.js"></script>
+
+<!-- Modules -->
+<script src="js/modules/home.js"></script>
+<script src="js/modules/employees.js"></script>
+<script src="js/modules/managers.js"></script>
+<script src="js/modules/pipeline.js"></script>
+<script src="js/modules/hrworkspace.js"></script>
+<script src="js/modules/simulator.js"></script>
+<script src="js/modules/administration.js"></script>
+<script src="js/modules/phase2.js"></script>
+
+<!-- App shell / router -->
+<script src="js/app.js"></script>
+
+<!-- Auth (login gate, replaces the old role dropdown) -->
+<script src="js/auth.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', initAuth);
+</script>
+</body>
+</html>
