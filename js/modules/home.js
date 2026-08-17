@@ -143,22 +143,6 @@ Modules.home = (() => {
         </div>
       </div>
 
-      <div class="panel mt-16">
-        <div class="panel-head"><div><h3>What changed recently</h3><div class="sub">Decision timeline across HR, TA and delivery</div></div></div>
-        <div class="panel-body">
-          <div class="timeline">
-            ${RECENT_EVENTS.slice(0,8).map(ev => `
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div>
-                  <div class="t-date">${Engine.fmtDate(ev.date)}</div>
-                  <div class="t-text">${esc(ev.text)}</div>
-                  <div class="t-actor">${esc(ev.actor)}</div>
-                </div>
-              </div>`).join('')}
-          </div>
-        </div>
-      </div>
     `;
 
     // ---- tables ----
