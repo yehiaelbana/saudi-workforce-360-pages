@@ -42,6 +42,13 @@ const Engine = (() => {
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  function fmtDateTime(dateStr) {
+    if (!dateStr) return '—';
+    const d = toDate(dateStr);
+    if (isNaN(d)) return '—';
+    return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
   function fmtPct(n, digits) {
     if (n === null || n === undefined || isNaN(n)) return '—';
     return (n * 100).toFixed(digits === undefined ? 1 : digits) + '%';
@@ -471,7 +478,7 @@ const Engine = (() => {
   }
 
   return {
-    toDate, daysBetween, daysUntil, tenure, fmtDate, fmtPct, fmtNum,
+    toDate, daysBetween, daysUntil, tenure, fmtDate, fmtDateTime, fmtPct, fmtNum,
     zoneFor, zoneIndex, nextZoneGap, marginToTarget,
     headcountStats, activeOf, deriveEmployee, professionCompliance, jobTitleCompliance,
     actionQueue, joiningSoon, leavingSoon, projection, managerScorecard,
