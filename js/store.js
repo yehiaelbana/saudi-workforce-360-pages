@@ -227,9 +227,11 @@ const Store = (() => {
   }
 
   async function deleteScenario(id) {
+    const existing = state.savedScenarios.find(s => s.id === id);
     const { error } = await supabaseClient.from('scenarios').delete().eq('id', id);
     if (error) throw error;
     state.savedScenarios = state.savedScenarios.filter(s => s.id !== id);
+    log('Delete Scenario', `Scenario "${existing ? existing.name : id}" deleted`);
     persist();
   }
 
