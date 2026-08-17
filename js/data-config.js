@@ -17,7 +17,7 @@ const ROLES = [
     label: 'HR & Admin',
     short: 'HR',
     description: 'Full control tower access — regulatory workspace, workforce register, administration.',
-    nav: ['home', 'employees', 'managers', 'pipeline', 'hrworkspace', 'simulator', 'administration'],
+    nav: ['home', 'employees', 'managers', 'pipeline', 'hrworkspace', 'simulator', 'administration', 'activitylog'],
     perms: { addEmployee: true, editEmployee: true, deleteEmployee: true, addRequisition: true, editRequisition: true, seeAlerts: true, seeAllTeams: true, editConfig: true, exportData: true },
   },
   {
@@ -137,20 +137,6 @@ const GOSI_WEIGHT_NOTE = "HRSD's calculator gives 0.5 weight to employees earnin
 // (PROFESSION_CATEGORIES, PROFESSIONS) — pulled directly from the workbook's
 // own HRSD-aligned "Saudization of Professions" reference table.
 // ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// RECENT DECISION TIMELINE (Home) — hand-curated illustrative narrative
-// ---------------------------------------------------------------------------
-const RECENT_EVENTS = [
-  { date: '2026-08-01', type: 'compliance', text: 'Qiwa contract documentation swept for 342 KSA records — 3 Saudi contracts flagged undocumented', actor: 'HR Workspace' },
-  { date: '2026-07-29', type: 'hire', text: '6 new joiners confirmed at Saudi Payments (ITO & Cloud) — 5 Saudi, 1 non-Saudi', actor: 'Talent Acquisition' },
-  { date: '2026-07-24', type: 'review', text: 'Quarterly Nitaqat position reviewed with Legal — entity remains in High Green zone at 60.7%', actor: 'HR Leadership' },
-  { date: '2026-07-18', type: 'transfer', text: '2 Analysts transferred from Custom Apps to Enterprise Apps to cover SAMA SAP go-live', actor: 'Omar Abdel Malak' },
-  { date: '2026-07-10', type: 'contract', text: '9 fixed-term contracts renewed ahead of expiry; 1 allowed to lapse (role redundant)', actor: 'HR & Admin' },
-  { date: '2026-07-02', type: 'req', text: '5 new requisitions opened against SAMA growth plan (Enterprise Apps, SAP skillset)', actor: 'Talent Acquisition' },
-  { date: '2026-06-27', type: 'data', text: 'Monthly workforce data refresh completed — 342 KSA + 18 RHQ records validated', actor: 'HR Operations' },
-  { date: '2026-06-15', type: 'exit', text: '3 non-Saudi employees completed final exit formalities after contract end', actor: 'HR & Admin' },
-];
 
 // ---------------------------------------------------------------------------
 // HOLIDAY CALENDAR (Administration + People Moments preview)
