@@ -11,6 +11,7 @@ const ROUTES = [
   { id: 'hrworkspace', label: 'HR Workspace', icon: 'shield', crumb: 'Saudi Regulatory Control Room', hrOnly: true },
   { id: 'simulator', label: 'Simulator', icon: 'sliders', crumb: 'Scenario Planning' },
   { id: 'administration', label: 'Administration', icon: 'settings', crumb: 'System Configuration', hrOnly: true },
+  { id: 'activitylog', label: 'Activity Log', icon: 'clock', crumb: 'Audit & Compliance Trail', hrOnly: true },
 ];
 
 const PHASE2_ROUTES = [
@@ -40,8 +41,11 @@ function currentRole() { return getRole(Store.role); }
 function routeAllowed(routeId) {
   const role = currentRole();
   const r = ROUTES.find(x => x.id === routeId);
-  if (!r) return true; // phase2 always reachable (preview)
-  return role.nav.includes(routeId);
+  if (r) return role.nav.includes(routeId);
+  // Phase 2 previews are unbuilt "Coming Soon" placeholders — HR & Admin
+  // only, so other roles don't see half-built features cluttering their nav.
+  if (PHASE2_ROUTES.some(x => x.id === routeId)) return role.id === 'hr';
+  return true;
 }
 
 function navigate(routeId) {
@@ -101,11 +105,13 @@ function renderSidebar() {
     html += `<div class="nav-item ${active ? 'active' : ''}" data-route="${r.id}">${Icon(r.icon)}<span>${r.label}</span>${badge}</div>`;
   });
 
-  html += '<div class="nav-section-label">Phase 2 · Coming Soon</div>';
-  PHASE2_ROUTES.forEach(r => {
-    const active = Router.current === r.id;
-    html += `<div class="nav-item ${active ? 'active' : ''}" data-route="${r.id}">${Icon(r.icon)}<span>${r.label}</span><span class="phase-tag">SOON</span></div>`;
-  });
+  if (role.id === 'hr') {
+    html += '<div class="nav-section-label">Phase 2 · Coming Soon</div>';
+    PHASE2_ROUTES.forEach(r => {
+      const active = Router.current === r.id;
+      html += `<div class="nav-item ${active ? 'active' : ''}" data-route="${r.id}">${Icon(r.icon)}<span>${r.label}</span><span class="phase-tag">SOON</span></div>`;
+    });
+  }
 
   el.innerHTML = html;
   qsa('.nav-item', el).forEach(item => item.addEventListener('click', () => navigate(item.dataset.route)));
